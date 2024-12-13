@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GunasAI - Japanese Garden</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #87CEEB 0%, #E6E6FA 100%);
+            overflow-x: hidden;
+        }
+
+        .landscape-background {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .mount-fuji {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 70vh;
+            background: linear-gradient(180deg, #FFFFFF 0%, #E6E6FA 100%);
+            clip-path: polygon(
+                50% 0%,
+                65% 40%,
+                100% 100%,
+                0% 100%,
+                35% 40%
+            );
+        }
+
+        @keyframes floatPetal {
+            0% {
+                transform: translateY(-10vh) rotate(0deg);
+            }
+            100% {
+                transform: translateY(110vh) rotate(360deg);
+            }
+        }
+
+        .cherry-blossom {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #FFB7C5;
+            border-radius: 50%;
+            filter: blur(1px);
+            opacity: 0.8;
+        }
+
+        .pagoda {
+            position: absolute;
+            bottom: 20vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 300px;
+            background: #8B0000;
+            clip-path: polygon(
+                20% 100%, 80% 100%,
+                75% 80%, 85% 80%,
+                80% 60%, 90% 60%,
+                85% 40%, 95% 40%,
+                90% 20%, 100% 20%,
+                50% 0%,
+                0% 20%, 10% 20%,
+                5% 40%, 15% 40%,
+                10% 60%, 20% 60%,
+                15% 80%, 25% 80%
+            );
+        }
+
+        .torii-gate {
+            position: absolute;
+            bottom: 25vh;
+            width: 150px;
+            height: 120px;
+            background: #FF0000;
+        }
+
+        .torii-left {
+            left: 20vw;
+        }
+
+        .torii-right {
+            right: 20vw;
+        }
+
+        .reflection {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 20vh;
+            background: linear-gradient(180deg, rgba(135, 206, 235, 0.3) 0%, rgba(230, 230, 250, 0.1) 100%);
+            backdrop-filter: blur(5px);
+        }
+
+        .cyber-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 4.5rem;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #8B0000, #FF0000);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 
+                0 0 10px rgba(255, 0, 0, 0.3),
+                0 0 20px rgba(255, 0, 0, 0.2);
+            animation: titleFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes titleFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .chat-container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-container {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(139, 0, 0, 0.2);
+        }
+
+        .user-message {
+            background: rgba(139, 0, 0, 0.1);
+            border-left: 3px solid #8B0000;
+        }
+
+        .bot-message {
+            background: rgba(255, 192, 203, 0.1);
+            border-left: 3px solid #FFB7C5;
+        }
+
+        @keyframes rippleEffect {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(139, 0, 0, 0.2);
+            pointer-events: none;
+            width: 10px;
+            height: 10px;
+        }
+
+        .equalizer-container {
+            position: absolute;
+            bottom: -60px;
+            left: 20px;
+            right: 20px;
+            height: 40px;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .equalizer-bar {
+            width: 8px;
+            height: 100%;
+            background: linear-gradient(180deg, #ff0000, #ffb7c5);
+            border-radius: 4px;
+            transform-origin: bottom;
+            transition: transform 0.2s ease;
+            margin: 0 2px;
+        }
+
+        @keyframes discoGlow {
+            0% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); }
+            33% { box-shadow: 0 0 20px rgba(255, 183, 197, 0.3); }
+            66% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); }
+            100% { box-shadow: 0 0 20px rgba(255, 183, 197, 0.3); }
+        }
+
+        .equalizer-container::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 22px;
+            animation: discoGlow 4s infinite;
+            pointer-events: none;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        .sound-wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #8B0000, #FF0000);
+            transform-origin: left;
+            transition: transform 0.1s ease;
+        }
+
+        @keyframes glowChar {
+            0% { text-shadow: 0 0 5px rgba(139, 0, 0, 0.5); }
+            50% { text-shadow: 0 0 10px rgba(255, 0, 0, 0.8); }
+            100% { text-shadow: 0 0 5px rgba(139, 0, 0, 0.5); }
+        }
+
+        .glow-char {
+            animation: glowChar 0.5s ease-out forwards;
+        }
+
+        .custom-input:focus {
+            border-color: #8B0000;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.2);
+        }
+
+        .custom-button {
+            background: linear-gradient(90deg, #8B0000, #FF0000);
+            transition: all 0.3s ease;
+        }
+
+        .custom-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+    <div class="landscape-background">
+        <div class="mount-fuji"></div>
+        <div id="cherry-blossoms"></div>
+        <div class="pagoda"></div>
+        <div class="torii-gate torii-left"></div>
+        <div class="torii-gate torii-right"></div>
+        <div class="reflection"></div>
+    </div>
+
+    <div class="equalizer-container">
+        <div class="equalizer-bar"></div>
+        <div class="equalizer-bar"></div>
+        <div class="equalizer-bar"></div>
+        <div class="equalizer-bar"></div>
+        <div class="equalizer-bar"></div>
+        <div class="equalizer-bar"></div>
+        <div class="equalizer-bar"></div>
+        <div class="equalizer-bar"></div>
+        <div class="equalizer-bar"></div>
+        <div class="equalizer-bar"></div>
+    </div>
+
+    <div class="chat-container w-full max-w-4xl rounded-2xl p-6 relative z-10">
+        <h1 class="cyber-title text-center mb-8">
+            GunasAI
+        </h1>
+
+        <div id="chat-container" class="message-container rounded-xl p-4 mb-6 h-96 overflow-y-auto">
+            <!-- Messages will appear here -->
+        </div>
+
+        <div class="flex gap-4 mb-16">
+            <input type="text" 
+                id="message-input"
+                class="custom-input w-full px-4 py-3 rounded-xl focus:outline-none text-gray-800"
+                placeholder="Type your message..."
+            />
+            <button onclick="sendMessage()" 
+                class="custom-button px-6 py-3 text-white rounded-xl font-semibold">
+                Send
+            </button>
+        </div>
+
+        <div class="equalizer-container">
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+            <div class="equalizer-bar"></div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        function createCherryBlossoms() {
+            const container = document.getElementById('cherry-blossoms');
+            const numberOfPetals = 50;
+
+            for (let i = 0; i < numberOfPetals; i++) {
+                const petal = document.createElement('div');
+                petal.className = 'cherry-blossom';
+                
+                // Random starting position
+                petal.style.left = `${Math.random() * 100}%`;
+                
+                // Random animation duration and delay
+                const duration = 5 + Math.random() * 5;
+                const delay = Math.random() * 10;
+                petal.style.animation = `floatPetal ${duration}s linear ${delay}s infinite`;
+                
+                container.appendChild(petal);
+            }
+        }
+
+        const messageInput = document.getElementById('message-input');
+        const chatContainer = document.getElementById('chat-container');
+
+        function createMessageElement(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `${isUser ? 'user-message' : 'bot-message'} mb-4 p-3 rounded-lg max-w-[80%] ${
+                isUser ? 'ml-auto' : ''
+            }`;
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text-gray-800';
+            textDiv.textContent = content;
+            
+            messageDiv.appendChild(textDiv);
+            return messageDiv;
+        }
+
+        async function sendMessage() {
+            const content = messageInput.value.trim();
+            if (!content) return;
+
+            messageInput.value = '';
+
+            const userMessage = createMessageElement(content, true);
+            chatContainer.appendChild(userMessage);
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: content })
+                });
+                
+                const data = await response.json();
+                
+                const botMessage = createMessageElement(data.reply);
+                chatContainer.appendChild(botMessage);
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+                return;
+            }
+
+            // Create ripple effect
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            
+            // Position ripple at cursor position
+            const rect = messageInput.getBoundingClientRect();
+            const cursorX = e.clientX - rect.left;
+            const cursorY = e.clientY - rect.top;
+            
+            ripple.style.left = `${cursorX - 5}px`;
+            ripple.style.top = `${cursorY - 5}px`;
+            
+            messageInput.appendChild(ripple);
+            
+            // Animate and remove ripple
+            ripple.style.animation = 'rippleEffect 0.6s ease-out';
+            setTimeout(() => ripple.remove(), 600);
+
+            // Add glowing effect to typed character
+            const charSpan = document.createElement('span');
+            charSpan.textContent = e.key;
+            charSpan.className = 'glow-char';
+            
+
+
+            // Animate equalizer bars with wave effect
+            const bars = document.querySelectorAll('.equalizer-bar');
+            const totalBars = bars.length;
+            
+            bars.forEach((bar, index) => {
+                // Create a wave-like pattern
+                setTimeout(() => {
+                    const randomScale = 1 + Math.random() * 2;
+                    bar.style.transform = `scaleY(${randomScale})`;
+                    
+                    // Add random color variation
+                    const hue = Math.random() * 30 - 15; // subtle color variation
+                    bar.style.filter = `hue-rotate(${hue}deg)`;
+                    
+                    setTimeout(() => {
+                        bar.style.transform = 'scaleY(1)';
+                        bar.style.filter = 'hue-rotate(0deg)';
+                    }, 200);
+                }, index * 20); // Slight delay between each bar for wave effect
+            });
+        });
+
+        // Reset animations on blur
+        messageInput.addEventListener('blur', () => {
+            const soundWave = document.querySelector('.sound-wave');
+            soundWave.style.transform = 'scaleY(0)';
+            
+            const bars = document.querySelectorAll('.equalizer-bar');
+            bars.forEach(bar => {
+                bar.style.transform = 'scaleX(1)';
+                bar.style.filter = 'hue-rotate(0deg)';
+            });
+        });
+
+        // Initialize
+        createCherryBlossoms();
+
+        // Initial welcome message
+        setTimeout(() => {
+            const welcomeMessage = createMessageElement("Welcome to GunasAI. How may I assist you today?");
+            chatContainer.appendChild(welcomeMessage);
+        }, 500);
+    </script>
+</body>
+</html>
